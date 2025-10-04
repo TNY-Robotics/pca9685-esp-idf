@@ -36,17 +36,31 @@ extern "C" {
     \
 }
 
+/**
+ * @brief Structure containing basic information about the PCA9685 device.
+ * This structure holds the I2C address and clock speed required to communicate
+ * with the PCA9685 PWM controller.
+ */
 typedef struct {
-    uint16_t address;
-    uint32_t clock_speed;
+    uint16_t address;      /**< I2C address of the PCA9685 device */
+    uint32_t clock_speed;  /**< I2C clock speed in Hz */
 } pca9685_info_t;
 
+/**
+ * @brief Structure for configuring the PCA9685 device.
+ * This structure is used to set the PWM frequency for the PCA9685 controller.
+ */
 typedef struct {
-    uint16_t frequency_hz;
+    uint16_t frequency_hz; /**< PWM frequency in Hz */
 } pca9685_config_t;
 
+/**
+ * @brief Handle structure for the PCA9685 device.
+ * This structure contains the I2C master device handle used for communication
+ * with the PCA9685 controller.
+ */
 typedef struct {
-    i2c_master_dev_handle_t dev_handle;
+    i2c_master_dev_handle_t dev_handle; /**< I2C master device handle */
 } pca9685_handle_t;
 
 /**
