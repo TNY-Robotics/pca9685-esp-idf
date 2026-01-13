@@ -76,6 +76,18 @@ esp_err_t pca9685_config(pca9685_handle_t pca_handle, pca9685_config_t config)
         pca9685_write(pca_handle, reg_addr, two_zeros, 2); // white 0 on LED_ON_H and LED_ON_L
     }
 
+    // Disable ALL CALL to avoid weird additionnal I2C Adress responses
+    // And enable AI (Auto-Increment) for easier multi-byte writes
+    {
+        uint8_t mode1_reg;
+        esp_err_t ret = pca9685_read(pca_handle, PCA9685_MODE1, &mode1_reg, 1);
+        if (ret != ESP_OK) return ret;
+        mode1_reg &= (~BIT0); // clear bit 0 (ALLCALL)
+        mode1_reg |= BIT5;    // set bit 5 (AI)
+        ret = pca9685_write(pca_handle, PCA9685_MODE1, &mode1_reg, 1);
+        if (ret != ESP_OK) return ret;
+    }
+
     // set pca to sleep mode (required to change prescale)
     esp_err_t ret = pca9685_sleep(pca_handle);
     if (ret != ESP_OK) return ret;
@@ -104,12 +116,12 @@ esp_err_t pca9685_wake_up(pca9685_handle_t pca_handle)
         return ret;
     }
 
-    // if restart bit was set, wait 500 microseconds (rounded to 1ms) and write 1 in RESTART bit
-    if (tmp & BIT7)
-    {
-        vTaskDelay(pdMS_TO_TICKS(1));
-        tmp |= BIT7;
-        ret = pca9685_write(pca_handle, PCA9685_MODE1, &tmp, 1);
+    // wait 500 microseconds (rounded to 1ms) and write 1 in RESTART bit
+    vTaskDelay(pdMS_TO_TICKS(1));
+    tmp |= BIT7;
+    ret = pca9685_write(pca_handle, PCA9685_MODE1, &tmp, 1);
+    if (ESP_OK != ret) {
+        return ret;
     }
 
     return ret;
@@ -125,6 +137,9 @@ esp_err_t pca9685_sleep(pca9685_handle_t pca_handle)
     }
     tmp |= BIT4; // sleep bit to one
     ret = pca9685_write(pca_handle, PCA9685_MODE1, &tmp, 1);
+    if (ESP_OK != ret) {
+        return ret;
+    }
     return ret;
 }
 
@@ -137,7 +152,6 @@ esp_err_t pca9685_set_pwm(pca9685_handle_t pca_handle, uint8_t channel, uint16_t
 
     uint8_t reg_addr = PCA9685_LED0_OFF + channel * PCA9685_LED_REG_SHIFT;
     uint8_t data[2] = { val & 0xFF, (val >> 8) & 0xFF };
-    // ESP_LOGI("pca9685", "Writing at channel %u PWM %u (addr=0x%02X) (val=0x%04X -> 0x%02X 0x%02X)", channel, val, reg_addr, val, data[0], data[1]);
     return pca9685_write(pca_handle, reg_addr, data, 2);
 }
 
