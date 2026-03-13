@@ -165,8 +165,6 @@ esp_err_t pca9685_set_pwms(pca9685_handle_t pca_handle, uint16_t vals[PCA9685_NB
         }
     }
 
-    // FIXME : sending the right data, but first motor (index 0) has a fucked up rotation with this method ... idk why
-
     uint8_t data[PCA9685_NB_CHANNELS*PCA9685_LED_REG_SHIFT];
     for (int i = 0; i < PCA9685_NB_CHANNELS; i++)
     {
@@ -174,7 +172,6 @@ esp_err_t pca9685_set_pwms(pca9685_handle_t pca_handle, uint16_t vals[PCA9685_NB
         data[i * PCA9685_LED_REG_SHIFT + 1] = 0;                         // LED_ON_H to 0
         data[2 + i * PCA9685_LED_REG_SHIFT + 0] = vals[i] & 0xFF;        // LED_OFF low register
         data[2 + i * PCA9685_LED_REG_SHIFT + 1] = (vals[i] >> 8) & 0xFF; // LED_OFF high register
-        // ESP_LOGI("pca9685", "Block at index %u PWM %u (addr=0x%02X) (val=0x%04X -> 0x%02X 0x%02X)", i, vals[i], PCA9685_LED0_ON + 2 + i * PCA9685_LED_REG_SHIFT, vals[i], data[2 + i * PCA9685_LED_REG_SHIFT + 0], data[2 + i * PCA9685_LED_REG_SHIFT + 1]);
     }
 
     return pca9685_write(pca_handle, PCA9685_LED0_ON, data, PCA9685_NB_CHANNELS*PCA9685_LED_REG_SHIFT);
