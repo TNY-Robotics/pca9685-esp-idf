@@ -14,7 +14,7 @@ This driver implements communications with the PCA9685 using the new i2c esp-idf
 It is used to communicate with the PCA9685 controller using the ESP-IDF framework I2C master driver.
 
 > [!NOTE]
-> > Interrupts are not yet supported!
+Interrupts are not yet supported!
 
 ## Installation
 
