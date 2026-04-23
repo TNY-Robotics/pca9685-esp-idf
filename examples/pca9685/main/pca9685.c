@@ -10,7 +10,7 @@
  * This file is part of the PCA9685 ESP-IDF Driver.
  * 
  * License: MIT
- * Repository: https://github.com/tny-robotics/pca9685
+ * Repository: https://github.com/tny-robotics/pca9685-esp-idf
  * 
  * Author: TNY Robotics
  * Date: 19/06/2025
@@ -46,4 +46,22 @@ void app_main(void)
     // Create the i2c bus handle
     i2c_master_bus_handle_t i2c_bus_handle = NULL;
     ESP_ERROR_CHECK(i2c_new_master_bus(&bus_config, &i2c_bus_handle));
+
+    // Create the PCA9685 handle
+    pca9685_handle_t pca_handle;
+    ESP_ERROR_CHECK(pca9685_create(i2c_bus_handle, PCA9685_DEFAULT_INFO(), &pca_handle));
+
+    // Configure the PCA9685 with the default configuration
+    ESP_ERROR_CHECK(pca9685_config(pca_handle, PCA9685_DEFAULT_CONFIG()));
+
+    // Set all channels to 1.5ms pulse width (typical for neutral position of a servo)
+    uint16_t neutral_pwms[PCA9685_NB_CHANNELS];
+    for (int i = 0; i < PCA9685_NB_CHANNELS; i++)
+    {
+        neutral_pwms[i] = (uint16_t)((1.5 / 20) * 4096); // Convert 1.5ms pulse width to PCA9685 value
+    }
+    ESP_ERROR_CHECK(pca9685_set_pwms(pca_handle, neutral_pwms));
+
+    // Delete the PCA9685 handle and free resources
+    ESP_ERROR_CHECK(pca9685_delete(pca_handle));
 }

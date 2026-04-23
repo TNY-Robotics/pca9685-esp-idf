@@ -1,4 +1,4 @@
-menu "PCA9685"
+menu "PCA9685 ESP-IDF Driver"
             
     
   

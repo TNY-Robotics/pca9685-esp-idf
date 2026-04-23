@@ -5,7 +5,7 @@ Source code for the PCA9685 I2C PWM driver for ESP-IDF.
 ## Note
 This driver is optimized and thought for PWM servomotor control, not LED control.
 
-(no LED_ON register control, and default frequency is set to 50Hz)
+(only LED_OFF register control, and default frequency is set to 50Hz)
 
 ## Introduction
 
