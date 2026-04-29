@@ -27,14 +27,7 @@ extern "C" {
 
 #define PCA9685_NB_CHANNELS 16
 #define PCA9685_DEFAULT_ADDR 0x40
-#define PCA9685_DEFAULT_CLOCK 100000 // can be way higher is needed, PCA9685 supports fast mode+
-#define PCA9685_DEFAULT_INFO() {\
-    .address = PCA9685_DEFAULT_ADDR,\
-    .clock_speed = PCA9685_DEFAULT_CLOCK\
-}
-#define PCA9685_DEFAULT_CONFIG() {\
-    \
-}
+#define PCA9685_DEFAULT_CLOCK 100000 // can be way higher if needed, PCA9685 supports fast mode+
 
 /**
  * @brief Structure containing basic information about the PCA9685 device.
@@ -53,6 +46,19 @@ typedef struct {
 typedef struct {
     uint16_t frequency_hz; /**< PWM frequency in Hz */
 } pca9685_config_t;
+
+#ifdef __cplusplus
+#define PCA9685_DEFAULT_INFO() pca9685_info_t{PCA9685_DEFAULT_ADDR, PCA9685_DEFAULT_CLOCK}
+#define PCA9685_DEFAULT_CONFIG() pca9685_config_t{50}
+#else
+#define PCA9685_DEFAULT_INFO() ((pca9685_info_t){\
+    .address = PCA9685_DEFAULT_ADDR,\
+    .clock_speed = PCA9685_DEFAULT_CLOCK\
+})
+#define PCA9685_DEFAULT_CONFIG() ((pca9685_config_t){\
+    .frequency_hz = 50\
+})
+#endif
 
 /**
  * @brief Handle structure for the PCA9685 device.
