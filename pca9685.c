@@ -33,6 +33,7 @@
 #define PCA9685_LED0_ON 0x06
 #define PCA9685_LED0_OFF 0x08
 #define PCA9685_LED_REG_SHIFT 4 // 4 registers for each led
+#define PCA9685_ALL_LED_ON_L 0xFA
 
 /* PCA9685 constants */
 #define PCA9685_OSC_CLOCK 25000000
@@ -104,6 +105,27 @@ esp_err_t pca9685_config(pca9685_handle_t pca_handle, pca9685_config_t config)
     // wake up pca (frequency has been changed, back to normal)
     ESP_LOGD("PCA9685", "Waking up PCA9685 ...");
     return pca9685_wake_up(pca_handle);
+}
+
+esp_err_t pca9685_reset(pca9685_handle_t pca_handle)
+{
+    esp_err_t ret;
+
+    // MODE1 : Sleep + Auto-Increment
+    uint8_t mode1_val = BIT4 | BIT5; 
+    ret = pca9685_write(pca_handle, PCA9685_MODE1, &mode1_val, 1);
+    if (ret != ESP_OK) return ret;
+
+    // MODE2 : Factory reset (Totem Pole output = 0x04)
+    uint8_t mode2_val = 0x04;
+    ret = pca9685_write(pca_handle, PCA9685_MODE2, &mode2_val, 1);
+    if (ret != ESP_OK) return ret;
+
+    // Turn off all channels (FULL OFF)
+    uint8_t all_led_off[4] = {0x00, 0x00, 0x00, 0x10}; 
+    ret = pca9685_write(pca_handle, PCA9685_ALL_LED_ON_L, all_led_off, 4);
+    
+    return ret;
 }
 
 esp_err_t pca9685_wake_up(pca9685_handle_t pca_handle)

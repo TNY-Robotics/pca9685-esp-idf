@@ -95,6 +95,17 @@ esp_err_t pca9685_create(i2c_master_bus_handle_t i2c_bus_handle, pca9685_info_t 
 esp_err_t pca9685_config(pca9685_handle_t pca_handle, pca9685_config_t config);
 
 /**
+ * @brief Reset the PCA9685 device registers to a known safe state.
+ * @note This will immediately stop all PWM outputs (FULL OFF) and put the device to sleep.
+ *
+ * @param pca_handle Handle to the PCA9685 device.
+ * @return
+ * - ESP_OK: Success
+ * - ESP_FAIL: Reset failed
+ */
+esp_err_t pca9685_reset(pca9685_handle_t pca_handle);
+
+/**
  * @brief Wake up the PCA9685 device from sleep mode.
  *
  * @param pca_handle Handle to the PCA9685 device.
